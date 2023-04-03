@@ -2,6 +2,35 @@
 @tailwind components;
 @tailwind utilities;
 
+
+:root {
+    --primary: black;
+    --secondary: #708090;
+}
+
 body {
-    @apply bg-black text-slate-100
+	@apply bg-black text-slate-100;
+}
+
+/* Scrollbar */
+/* Firefox */
+* {
+	scrollbar-width: thin;
+	scrollbar-color: var(--secondary) var(--primary);
+}
+
+/* Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+	width: 10px;
+}
+
+*::-webkit-scrollbar-track {
+	background: var(--primary);
+	border-radius: 5px;
+}
+
+*::-webkit-scrollbar-thumb {
+	background-color: var(--secondary);
+	border-radius: 14px;
+	border: 3px solid var(--primary);
 }
