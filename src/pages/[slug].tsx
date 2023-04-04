@@ -1,28 +1,41 @@
-
-import type { GetStaticPaths, GetStaticProps, InferGetStaticPropsType, NextPage } from 'next';
+import type {
+	GetStaticPaths,
+	GetStaticProps,
+	InferGetStaticPropsType,
+	NextPage,
+} from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
 
 import { api } from '~/utils/api';
-import type { RouterOutputs } from '~/utils/api';
 
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
-import { LoadingPage, LoadingSpinner } from '~/components/loading';
-import { useState } from 'react';
-import toast from 'react-hot-toast';
+import { LoadingPage } from '~/components/loading';
 
-type PageProps = InferGetStaticPropsType<typeof getStaticProps>;
+const ProfileFeed = (props: { username: string }) => {
+	const { data, isLoading } = api.posts.getPostsByUserId.useQuery({
+		userId: props.username,
+	});
 
-const ProfilePage: NextPage<{username: string}> = ({ username }) => {
+	if (isLoading) return <LoadingPage />;
+
+	if (!data || data.length === 0) return <div>User has no posts yet.</div>;
+
+	return (
+		<div className="flex flex-col">
+			{data.map((fullPost) => (
+				<PostView key={fullPost.post.id} {...fullPost} />
+			))}
+		</div>
+	);
+};
+
+const ProfilePage: NextPage<{ username: string }> = ({ username }) => {
 	const { data, isLoading } = api.profile.getUserByUsername.useQuery({
 		username,
 	});
 
 	if (isLoading) return <LoadingPage />;
 	if (!data) return <div>404</div>;
-
-	console.log(username);
 
 	return (
 		<>
@@ -38,6 +51,7 @@ const ProfilePage: NextPage<{username: string}> = ({ username }) => {
 						width={128}
 						height={128}
 						className="absolute bottom-0 left-0 -mb-[64px] ml-4 rounded-full border-4 border-black bg-black"
+						priority
 					/>
 				</div>
 				<div className="h-[64px]"></div>
@@ -45,6 +59,7 @@ const ProfilePage: NextPage<{username: string}> = ({ username }) => {
 					data.username ?? ''
 				}`}</div>
 				<div className="w-full border-b border-slate-400" />
+				<ProfileFeed username={data.id} />
 			</PageLayout>
 		</>
 	);
@@ -55,6 +70,7 @@ import { appRouter } from '~/server/api/root';
 import { prisma } from '~/server/db';
 import SuperJSON from 'superjson';
 import { PageLayout } from '~/components/layout';
+import { PostView } from '~/components/postview';
 
 export const getStaticProps: GetStaticProps = async (context) => {
 	const ssg = createProxySSGHelpers({
