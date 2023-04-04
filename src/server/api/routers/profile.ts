@@ -6,7 +6,7 @@ import {
 	createTRPCRouter,
 	publicProcedure,
 } from '~/server/api/trpc';
-import { filterForClient } from '~/server/helpers/FilterUserForClient';
+import { filterUserForClient } from '~/server/helpers/FilterUserForClient';
 
 
 export const profileRouter = createTRPCRouter({
@@ -24,6 +24,6 @@ export const profileRouter = createTRPCRouter({
                 });
             }
 
-            return filterForClient(user);
+            return filterUserForClient(user);
         })
 });
